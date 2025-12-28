@@ -14,8 +14,28 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // Log the incoming request for debugging
+  console.log(`[LOGIN] ${req.method} request to /api/auth/login`);
+
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.status(200).end();
+  }
+
+  // Set CORS headers for all responses
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    console.error(`[LOGIN] Invalid method: ${req.method}, expected POST`);
+    return res.status(405).json({ 
+      success: false,
+      error: `Method not allowed. Expected POST, got ${req.method || 'undefined'}` 
+    });
   }
 
   await connectDB();
