@@ -125,7 +125,7 @@ async function handler(
     const runningLetters: string[] = [];
     const allRunning: Array<{ letter: string; key: string }> = [];
     
-    for (const [key, value] of runningImports.entries()) {
+    for (const [key, value] of Array.from(runningImports.entries())) {
       if (key.startsWith(baseKey)) {
         runningLetters.push(value.letter);
         allRunning.push({ letter: value.letter, key });
@@ -176,7 +176,7 @@ async function handler(
       // Stop all running imports for this client
       const stoppedLetters: string[] = [];
       
-      for (const [key, value] of runningImports.entries()) {
+      for (const [key, value] of Array.from(runningImports.entries())) {
         if (key.startsWith(baseKey)) {
           value.stop = true;
           stoppedLetters.push(value.letter);
@@ -394,7 +394,7 @@ async function startImportProcess(
 
       // Process batch concurrently
       const batchResults = await Promise.allSettled(
-        batch.map((meal, batchIndex) => 
+        batch.map((meal: any, batchIndex: number) => 
           processMeal(importKey, meal, i + batchIndex + 1, meals.length)
         )
       );
