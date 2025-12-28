@@ -52,12 +52,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     const storedToken = localStorage.getItem('authToken');
-    if (!storedToken) {
-      router.push('/login');
-      return;
+    if (storedToken) {
+      setToken(storedToken);
+      loadUserData();
+    } else {
+      setLoading(false);
     }
-    setToken(storedToken);
-    loadUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -98,7 +98,7 @@ export default function Dashboard() {
       setError(err instanceof Error ? err.message : 'Failed to load data');
       if (err instanceof Error && err.message.includes('401')) {
         localStorage.removeItem('authToken');
-        router.push('/login');
+        setToken(null);
       }
     } finally {
       setLoading(false);
@@ -228,6 +228,33 @@ export default function Dashboard() {
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
             <p className="mt-4 text-gray-600">Loading...</p>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  if (!token) {
+    return (
+      <>
+        <Head>
+          <title>Dashboard - Recipe DB</title>
+        </Head>
+        <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="max-w-md w-full bg-white rounded-xl shadow-md p-8 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Please Log In</h2>
+            <p className="text-gray-600 mb-6">You need to be logged in to access your dashboard.</p>
+            <Link
+              href="/login"
+              className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+            >
+              Go to Login
+            </Link>
           </div>
         </main>
       </>
