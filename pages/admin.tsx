@@ -123,6 +123,21 @@ export default function AdminPage() {
         body: JSON.stringify({ email, password }),
       });
 
+      // Check if response is ok and has content
+      if (!response.ok) {
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch {
+          // If response is not JSON, use status text
+          const text = await response.text();
+          if (text) errorMessage = text;
+        }
+        setError(errorMessage);
+        return;
+      }
+
       const data = await response.json();
 
       if (!data.success) {

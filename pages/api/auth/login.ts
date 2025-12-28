@@ -5,6 +5,15 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
+// Export config to ensure Next.js recognizes this as an API route
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '1mb',
+    },
+  },
+};
+
 /**
  * POST /api/auth/login
  * Login user and get JWT token
@@ -15,7 +24,13 @@ export default async function handler(
   res: NextApiResponse
 ) {
   // Log the incoming request for debugging
-  console.log(`[LOGIN] ${req.method} request to /api/auth/login`);
+  console.log(`[LOGIN] ${req.method} request to /api/auth/login`, {
+    url: req.url,
+    headers: {
+      'content-type': req.headers['content-type'],
+      'user-agent': req.headers['user-agent'],
+    },
+  });
 
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -30,6 +45,7 @@ export default async function handler(
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
+  // Only allow POST method
   if (req.method !== 'POST') {
     console.error(`[LOGIN] Invalid method: ${req.method}, expected POST`);
     return res.status(405).json({ 
