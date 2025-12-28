@@ -123,22 +123,25 @@ export default function AdminPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      // Check if response is ok and has content
-      if (!response.ok) {
-        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorData.message || errorMessage;
-        } catch {
-          // If response is not JSON, use status text
-          const text = await response.text();
-          if (text) errorMessage = text;
-        }
-        setError(errorMessage);
+      // Read response body once
+      const contentType = response.headers.get('content-type');
+      const isJson = contentType && contentType.includes('application/json');
+      
+      let data: any;
+      if (isJson) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        setError(text || `HTTP ${response.status}: ${response.statusText}`);
         return;
       }
 
-      const data = await response.json();
+      // Check if response is ok
+      if (!response.ok) {
+        const errorMessage = data.error || data.message || `HTTP ${response.status}: ${response.statusText}`;
+        setError(errorMessage);
+        return;
+      }
 
       if (!data.success) {
         setError(data.error || 'Login failed');
